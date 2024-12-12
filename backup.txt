@@ -1,0 +1,145 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import webbrowser
+import pyautogui
+import difflib
+
+# Inicializar el reconocedor y el motor de voz
+recognizer = sr.Recognizer()
+engine = pyttsx3.init()
+
+# Hablar texto
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Reconocer comandos de voz
+def recognize_command():
+    with sr.Microphone() as source:
+        print("Escuchando...")
+        recognizer.adjust_for_ambient_noise(source, duration=2)
+        audio = recognizer.listen(source)
+        try:
+            command = recognizer.recognize_google(audio, language="es-ES").lower()
+            print("Dijiste: " + command)
+        except sr.UnknownValueError:
+            print("Lo siento, no pude entender lo que dijiste.")
+            command = ""
+        except sr.RequestError:
+            print("No pude solicitar resultados; verifica tu conexión a Internet.")
+            command = ""
+        return command
+
+# Coincidencia difusa
+def fuzzy_match(command, keywords):
+    matches = difflib.get_close_matches(command, keywords, cutoff=0.6)
+    return matches[0] if matches else None
+
+# Navegar por la web
+def open_browser():
+    speak("¿Qué te gustaría buscar?")
+    query = recognize_command()
+    if query:
+        webbrowser.open(f"https://www.google.com/search?q={query}")
+
+# Principal
+def main():
+    keywords = ["mi nombre", "hora", "abrir navegador", "escribir", "salir"]
+    speak("¡Hola! ¿En qué puedo ayudarte?")
+    while True:
+        command = recognize_command()
+        matched = fuzzy_match(command, keywords)
+        if matched == "mi nombre":
+            speak("Me llamo Sofía, tu asistente personal.")
+        elif matched == "hora":
+            current_time = datetime.datetime.now().strftime("%H:%M %p")
+            speak("La hora actual es " + current_time)
+        elif matched == "abrir navegador":
+            open_browser()
+        elif matched == "escribir":
+            speak("¿Qué deseas escribir?")
+            text = recognize_command()
+            if text:
+                pyautogui.write(text)
+                speak(f"He escrito: {text}")
+        elif matched == "salir":
+            speak("¡Adiós! ¡Que tengas un gran día!")
+            break
+        else:
+            speak("No estoy segura de cómo responder a eso.")
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import webbrowser
+import pyautogui
+
+# Initialize the speech recognizer and text-to-speech engine
+recognizer = sr.Recognizer()
+engine = pyttsx3.init()
+
+# Function to speak a response
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Function to recognize voice commands
+def recognize_command():
+    with sr.Microphone() as source:
+        print("Escuchando...")
+        recognizer.adjust_for_ambient_noise(source, duration=1)  # Ajuste para ruido ambiental
+        audio = recognizer.listen(source)  # Escucha la voz del usuario
+        try:
+            # Reconocimiento de voz en español
+            command = recognizer.recognize_google(audio, language="es-ES").lower()  # Reconoce el comando de voz en español
+            print("Dijiste: " + command)
+        except sr.UnknownValueError:
+            print("Lo siento, no pude entender lo que dijiste.")
+            command = ""
+        except sr.RequestError as e:
+            print("No pude solicitar resultados; verifica tu conexión a Internet.")
+            command = ""
+        return command
+
+# Function to open a web browser and search something
+def open_browser():
+    speak("¿Qué te gustaría buscar?")
+    command = recognize_command()
+    if command:
+        webbrowser.open(f"https://www.google.com/search?q={command}")
+
+# Main function to handle voice commands
+def main():
+    speak("¡Hola! ¿En qué puedo ayudarte?")
+    while True:
+        command = recognize_command()
+        if "mi nombre" in command:
+            speak("Me llamo Sofía, tu asistente personal.")
+        elif "hora" in command:
+            current_time = datetime.datetime.now().strftime("%H:%M %p")
+            speak("La hora actual es " + current_time)
+        elif "abrir navegador" in command:
+            open_browser()
+        elif "escribir" in command:
+            speak("¿Qué deseas escribir?")
+            text = recognize_command()
+            if text:
+                pyautogui.write(text)
+                speak(f"He escrito: {text}")
+        elif "salir" in command or "adiós" in command:
+            speak("¡Adiós! ¡Que tengas un gran día!")
+            break
+        else:
+            speak("No estoy segura de cómo responder a eso.")
+
+if __name__ == "__main__":
+    main()
